@@ -4,39 +4,40 @@ import javax.swing.*;
 
 public class GameWindow extends JFrame {
     private static GameWindow instance;
-
-    public GameWindow() {
-        instance = this;
-
-        setTitle("Memorizing Card - Kesya");
-        setSize(800, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setResizable(false);
-        setLocationRelativeTo(null);
-
-        showMenu(); // awal tampil menu
-        setVisible(true);
-    }
+    private JPanel currentPanel;
 
     public static GameWindow getInstance() {
+        if (instance == null) {
+            instance = new GameWindow();
+        }
         return instance;
     }
 
-    public void showMenu() {
-        setContentPane(new MenuPanel());
+    public GameWindow() {
+        setTitle("Memorizing Card");
+        setSize(800, 600);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        showMenu();
+    }
+
+    public void setPanel(JPanel panel) {
+        if (currentPanel != null) remove(currentPanel);
+        currentPanel = panel;
+        add(currentPanel);
         revalidate();
         repaint();
     }
 
-    public void showGamePanel1Player() {
-        setContentPane(new GamePanel(1)); // mode 1 player
-        revalidate();
-        repaint();
+    public void showMenu() {
+        setPanel(new MenuPanel());
+    }
+
+    public void showGamePanel1Player(int difficulty) {
+        setPanel(new GamePanel(1, difficulty));
     }
 
     public void showGamePanel2Player() {
-        setContentPane(new GamePanel(2)); // mode 2 player
-        revalidate();
-        repaint();
+        setPanel(new GamePanel(2, 0)); // difficulty nggak dipakai di 2P
     }
 }
