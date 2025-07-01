@@ -13,16 +13,20 @@ public class GameWindow extends JFrame {
         return instance;
     }
 
-    public GameWindow() {
+    private GameWindow() {
         setTitle("Memorizing Card");
         setSize(800, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
         setLocationRelativeTo(null);
         showMenu();
+        setVisible(true);
     }
 
     public void setPanel(JPanel panel) {
-        if (currentPanel != null) remove(currentPanel);
+        if (currentPanel != null) {
+            remove(currentPanel);
+        }
         currentPanel = panel;
         add(currentPanel);
         revalidate();
@@ -33,11 +37,7 @@ public class GameWindow extends JFrame {
         setPanel(new MenuPanel());
     }
 
-    public void showGamePanel1Player(int difficulty) {
-        setPanel(new GamePanel(1, difficulty));
-    }
-
-    public void showGamePanel2Player() {
-        setPanel(new GamePanel(2, 0)); // difficulty nggak dipakai di 2P
+    public void showGame(int mode, int difficulty) {
+        setPanel(new GamePanel(mode, difficulty));
     }
 }

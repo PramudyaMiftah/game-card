@@ -16,12 +16,11 @@ public class MenuPanel extends JPanel {
         JButton twoPlayerBtn = new JButton("2 Player");
         JButton exitBtn = new JButton("Keluar");
 
-        // 1 PLAYER BUTTON - PILIH MODE
         onePlayerBtn.addActionListener(e -> {
-            String[] options = {"Easy", "Medium", "Hard"};
-            int selected = JOptionPane.showOptionDialog(
+            String[] options = {"Easy (4x4)", "Medium (5x4)", "Hard (6x5)"};
+            int difficulty = JOptionPane.showOptionDialog(
                     this,
-                    "Pilih Mode Permainan",
+                    "Pilih Tingkat Kesulitan",
                     "1 Player Mode",
                     JOptionPane.DEFAULT_OPTION,
                     JOptionPane.INFORMATION_MESSAGE,
@@ -30,13 +29,28 @@ public class MenuPanel extends JPanel {
                     options[0]
             );
 
-            if (selected != -1) {
-                GameWindow.getInstance().showGamePanel1Player(selected);
+            if (difficulty != -1) {
+                GameWindow.getInstance().showGame(1, difficulty);
             }
         });
 
-        // 2 PLAYER BUTTON
-        twoPlayerBtn.addActionListener(e -> GameWindow.getInstance().showGamePanel2Player());
+        twoPlayerBtn.addActionListener(e -> {
+            String[] options = {"Easy (4x4)", "Medium (5x4)", "Hard (6x5)"};
+            int difficulty = JOptionPane.showOptionDialog(
+                    this,
+                    "Pilih Tingkat Kesulitan",
+                    "2 Player Mode",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+
+            if (difficulty != -1) {
+                GameWindow.getInstance().showGame(2, difficulty);
+            }
+        });
 
         exitBtn.addActionListener(e -> System.exit(0));
 
@@ -44,6 +58,8 @@ public class MenuPanel extends JPanel {
         buttonPanel.add(twoPlayerBtn);
         buttonPanel.add(exitBtn);
 
-        add(buttonPanel, BorderLayout.CENTER);
+        JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.add(buttonPanel);
+        add(wrapperPanel, BorderLayout.CENTER);
     }
 }

@@ -2,7 +2,6 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,18 +29,13 @@ public class GamePanel extends JPanel {
         this.difficulty = difficulty;
         setLayout(new BorderLayout());
 
-        // Ukuran grid sesuai mode
-        if (mode == 1) {
-            switch (difficulty) {
-                case 0 -> { rows = 4; cols = 4; }
-                case 1 -> { rows = 5; cols = 4; }
-                case 2 -> { rows = 6; cols = 5; }
-            }
-        } else {
-            rows = 4; cols = 4;
+        switch (difficulty) {
+            case 0 -> { rows = 4; cols = 4; }
+            case 1 -> { rows = 5; cols = 4; }
+            case 2 -> { rows = 6; cols = 5; }
+            default -> { rows = 4; cols = 4; }
         }
 
-        // Panel atas
         JPanel topPanel = new JPanel(new GridLayout(1, mode == 1 ? 3 : 2));
         if (mode == 1) {
             lifeLabel = new JLabel("❤️ Nyawa: " + lives);
@@ -57,7 +51,6 @@ public class GamePanel extends JPanel {
         }
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel kartu
         JPanel gridPanel = new JPanel(new GridLayout(rows, cols, 10, 10));
         List<String> cardNames = generateCardPairs(rows * cols);
         for (String name : cardNames) {
@@ -69,7 +62,6 @@ public class GamePanel extends JPanel {
         }
         add(gridPanel, BorderLayout.CENTER);
 
-        // Panel bawah
         JPanel bottomPanel = new JPanel();
         JButton backBtn = new JButton("Kembali ke Menu");
         backBtn.addActionListener(e -> {
@@ -85,8 +77,7 @@ public class GamePanel extends JPanel {
     }
 
     private void handleCardClick(CardUI clicked) {
-        if (clicked.isMatched() || clicked.isFaceUp()) return;
-        if (secondCard != null) return;
+        if (clicked.isMatched() || clicked.isFaceUp() || secondCard != null) return;
 
         clicked.flipUp();
 
@@ -102,7 +93,7 @@ public class GamePanel extends JPanel {
                 if (mode == 2) {
                     if (currentPlayer == 1) scoreP1++;
                     else scoreP2++;
-                    updateScoreAndTurn(false);
+                    updateScoreAndTurn();
                 }
 
                 firstCard = null;
@@ -111,9 +102,6 @@ public class GamePanel extends JPanel {
                 if (mode == 1 && isGameWon()) {
                     if (countdownTimer != null) countdownTimer.stop();
                     showWinDialog();
-                } else if (mode == 1) {
-                    timeLeft = 60;
-                    timerLabel.setText("🕒 Timer: " + timeLeft + " detik");
                 }
 
             } else {
@@ -121,21 +109,9 @@ public class GamePanel extends JPanel {
                     firstCard.flipDown();
                     secondCard.flipDown();
 
-                    if (mode == 1) {
-                        lives--;
-                        lifeLabel.setText("❤️ Nyawa: " + lives);
-                        if (lives <= 0) {
-                            countdownTimer.stop();
-                            JOptionPane.showMessageDialog(this, "Game Over! Kamu kehabisan nyawa.");
-                            GameWindow.getInstance().showMenu();
-                            return;
-                        }
-                        timeLeft = 60;
-                        timerLabel.setText("🕒 Timer: " + timeLeft + " detik");
-                        countdownTimer.restart();
-                    } else {
+                    if (mode == 2) {
                         currentPlayer = (currentPlayer == 1) ? 2 : 1;
-                        updateScoreAndTurn(true);
+                        updateScoreAndTurn();
                     }
 
                     firstCard = null;
@@ -155,20 +131,22 @@ public class GamePanel extends JPanel {
             if (timeLeft <= 0) {
                 lives--;
                 lifeLabel.setText("❤️ Nyawa: " + lives);
-                timeLeft = 60;
-                timerLabel.setText("🕒 Timer: " + timeLeft + " detik");
 
                 if (lives <= 0) {
                     countdownTimer.stop();
                     JOptionPane.showMessageDialog(this, "Game Over! Kamu kehabisan nyawa.");
                     GameWindow.getInstance().showMenu();
+                } else {
+                    timeLeft = 60;
+                    timerLabel.setText("🕒 Timer: " + timeLeft + " detik");
+                    JOptionPane.showMessageDialog(this, "Waktu Habis! Kamu kehilangan 1 nyawa.");
                 }
             }
         });
         countdownTimer.start();
     }
 
-    private void updateScoreAndTurn(boolean switched) {
+    private void updateScoreAndTurn() {
         if (mode == 2) {
             turnLabel.setText("👤 Giliran: Player " + currentPlayer);
             scoreLabel.setText("Skor P1: " + scoreP1 + " | Skor P2: " + scoreP2);
@@ -214,7 +192,7 @@ public class GamePanel extends JPanel {
         );
 
         if (option == 0) {
-            GameWindow.getInstance().showGamePanel1Player(difficulty);
+            GameWindow.getInstance().showGame(1, difficulty);
         } else {
             GameWindow.getInstance().showMenu();
         }
