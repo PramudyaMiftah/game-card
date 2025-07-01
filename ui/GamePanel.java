@@ -5,6 +5,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.awt.image.BufferedImage;
 
 public class GamePanel extends JPanel {
     private int mode;
@@ -54,7 +55,14 @@ public class GamePanel extends JPanel {
         JPanel gridPanel = new JPanel(new GridLayout(rows, cols, 10, 10));
         List<String> cardNames = generateCardPairs(rows * cols);
 
-        ImageIcon backIcon = new ImageIcon("../assets/cards/card_back.png");
+        ImageIcon backIcon;
+        java.net.URL backImgURL = getClass().getResource("/assets/cards/card_back.png");
+        if (backImgURL != null) {
+            backIcon = new ImageIcon(backImgURL);
+        } else {
+            System.err.println("Nggak nemu file gambar: /assets/cards/card_back.png");
+            backIcon = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB));
+        }
         for (String name : cardNames) {
             ImageIcon icon = loadCardImage(name);
             CardUI card = new CardUI(name, icon, backIcon);
@@ -157,9 +165,9 @@ public class GamePanel extends JPanel {
 
     private List<String> generateCardPairs(int totalCards) {
         String[] possible = {
-                "apple", "banana", "cherry", "duck", "fish",
-                "frog", "leaf", "star", "sun", "moon",
-                "cat", "dog", "heart", "ice", "key"
+                "apple", "avocado", "carrot", "coffe",
+                "hammy", "frog", "eskrim", "depe", "CUPCAKE",
+                "jerapah", "mushroom", "heart", "penguin", "tomat", "watermelon",
         };
         List<String> names = new ArrayList<>();
         for (int i = 0; i < totalCards / 2; i++) {
@@ -171,7 +179,28 @@ public class GamePanel extends JPanel {
     }
 
     private ImageIcon loadCardImage(String name) {
-        return new ImageIcon("assets/cards/" + name + ".png");
+        String[] extensions = {".png", ".jpg", ".jpeg"};
+        int desiredWidth = 100;  // Lebar gambar yang kamu inginkan (sesuaikan)
+        int desiredHeight = 100; // Tinggi gambar yang kamu inginkan (sesuaikan)
+
+        for (String ext : extensions) {
+            String path = "/assets/cards/" + name + ext;
+            java.net.URL imgURL = getClass().getResource(path);
+
+            if (imgURL != null) {
+                ImageIcon originalIcon = new ImageIcon(imgURL);
+                Image scaledImage = originalIcon.getImage().getScaledInstance(desiredWidth, desiredHeight, Image.SCALE_SMOOTH);
+                return new ImageIcon(scaledImage);
+            }
+        }
+
+        System.err.println("Nggak nemu file gambar untuk: " + name + " (sudah coba .png, .jpg, .jpeg)");
+        BufferedImage placeholder = new BufferedImage(desiredWidth, desiredHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = placeholder.createGraphics();
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, desiredWidth, desiredHeight);
+        g.dispose();
+        return new ImageIcon(placeholder);
     }
 
     private boolean isGameWon() {
