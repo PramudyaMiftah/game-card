@@ -1,50 +1,42 @@
+// Buat file baru bernama CardUI.java
 package ui;
 
 import javax.swing.*;
 
 public class CardUI {
     private String name;
-    private ImageIcon frontIcon;
-    private static final ImageIcon backIcon = new ImageIcon("assets/cards/apple.png");
-
     private JButton button;
-    private boolean matched = false;
-    private boolean faceUp = false;
+    private ImageIcon iconFront; // Gambar depan (isi kartu)
+    private ImageIcon iconBack;  // Gambar belakang (kartu tertutup)
+    private boolean isFaceUp = false;
+    private boolean isMatched = false;
 
-    public CardUI(String name, ImageIcon frontIcon) {
+    public CardUI(String name, ImageIcon front, ImageIcon back) {
         this.name = name;
-        this.frontIcon = frontIcon;
-        this.button = new JButton();
-        flipDown(); // tampilan awal = tertutup
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public JButton getButton() {
-        return button;
-    }
-
-    public boolean isMatched() {
-        return matched;
-    }
-
-    public void setMatched(boolean matched) {
-        this.matched = matched;
-    }
-
-    public boolean isFaceUp() {
-        return faceUp;
+        this.iconFront = front;
+        this.iconBack = back;
+        this.button = new JButton(iconBack); // Awalnya tampilkan gambar belakang
     }
 
     public void flipUp() {
-        faceUp = true;
-        button.setIcon(frontIcon);
+        button.setIcon(iconFront);
+        isFaceUp = true;
     }
 
     public void flipDown() {
-        faceUp = false;
-        button.setIcon(backIcon);
+        button.setIcon(iconBack);
+        isFaceUp = false;
+    }
+
+    // --- Getter dan Setter lainnya ---
+    public JButton getButton() { return button; }
+    public String getName() { return name; }
+    public boolean isFaceUp() { return isFaceUp; }
+    public boolean isMatched() { return isMatched; }
+    public void setMatched(boolean matched) {
+        isMatched = matched;
+        if (matched) {
+            button.setEnabled(false); // Matikan tombol jika sudah cocok
+        }
     }
 }

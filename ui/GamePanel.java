@@ -53,9 +53,11 @@ public class GamePanel extends JPanel {
 
         JPanel gridPanel = new JPanel(new GridLayout(rows, cols, 10, 10));
         List<String> cardNames = generateCardPairs(rows * cols);
+
+        ImageIcon backIcon = new ImageIcon("assets/cards/card_back.png");
         for (String name : cardNames) {
             ImageIcon icon = loadCardImage(name);
-            CardUI card = new CardUI(name, icon);
+            CardUI card = new CardUI(name, frontIcon, backIcon);
             card.getButton().addActionListener(e -> handleCardClick(card));
             cards.add(card);
             gridPanel.add(card.getButton());
