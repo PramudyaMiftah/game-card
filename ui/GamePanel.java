@@ -2,27 +2,30 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.awt.image.BufferedImage;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+import java.util.Timer;
 
 public class GamePanel extends JPanel {
     private int mode;
     private int difficulty;
     private int rows, cols;
 
-    private CardUI firstCard = null;
-    private CardUI secondCard = null;
     private List<CardUI> cards = new ArrayList<>();
+    private Stack<CardUI> openedCards = new Stack<>();
 
     private int lives = 3;
     private int timeLeft = 60;
     private Timer countdownTimer;
     private JLabel lifeLabel, timerLabel;
 
-    private int currentPlayer = 1;
     private int scoreP1 = 0, scoreP2 = 0;
+    private Queue<Integer> playerTurnQueue = new LinkedList<>();
     private JLabel turnLabel, scoreLabel;
 
     public GamePanel(int mode, int difficulty) {
@@ -45,7 +48,9 @@ public class GamePanel extends JPanel {
             topPanel.add(timerLabel);
             topPanel.add(new JLabel("⭐ Level: " + getDifficultyLabel()));
         } else {
-            turnLabel = new JLabel("👤 Giliran: Player 1");
+            playerTurnQueue.add(1);
+            playerTurnQueue.add(2);
+            turnLabel = new JLabel("👤 Giliran: Player " + playerTurnQueue.peek());
             scoreLabel = new JLabel("Skor P1: 0 | Skor P2: 0");
             topPanel.add(turnLabel);
             topPanel.add(scoreLabel);
@@ -54,7 +59,6 @@ public class GamePanel extends JPanel {
 
         JPanel gridPanel = new JPanel(new GridLayout(rows, cols, 10, 10));
         List<String> cardNames = generateCardPairs(rows * cols);
-
         ImageIcon backIcon;
         java.net.URL backImgURL = getClass().getResource("/assets/cards/card_back.png");
         if (backImgURL != null) {
@@ -63,9 +67,10 @@ public class GamePanel extends JPanel {
             System.err.println("Nggak nemu file gambar: /assets/cards/card_back.png");
             backIcon = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB));
         }
+
         for (String name : cardNames) {
-            ImageIcon icon = loadCardImage(name);
-            CardUI card = new CardUI(name, icon, backIcon);
+            ImageIcon frontIcon = loadCardImage(name);
+            CardUI card = new CardUI(name, frontIcon, backIcon);
             card.getButton().addActionListener(e -> handleCardClick(card));
             cards.add(card);
             gridPanel.add(card.getButton());
@@ -75,7 +80,7 @@ public class GamePanel extends JPanel {
         JPanel bottomPanel = new JPanel();
         JButton backBtn = new JButton("Kembali ke Menu");
         backBtn.addActionListener(e -> {
-            if (countdownTimer != null) countdownTimer.stop();
+            stopTimer();
             GameWindow.getInstance().showMenu();
         });
         bottomPanel.add(backBtn);
@@ -87,45 +92,41 @@ public class GamePanel extends JPanel {
     }
 
     private void handleCardClick(CardUI clicked) {
-        if (clicked.isMatched() || clicked.isFaceUp() || secondCard != null) return;
+        if (clicked.isMatched() || openedCards.contains(clicked) || openedCards.size() >= 2) {
+            return;
+        }
 
         clicked.flipUp();
+        openedCards.push(clicked);
 
-        if (firstCard == null) {
-            firstCard = clicked;
-        } else {
-            secondCard = clicked;
+        if (openedCards.size() == 2) {
+            CardUI second = openedCards.pop();
+            CardUI first = openedCards.pop();
 
-            if (firstCard.getName().equals(secondCard.getName())) {
-                firstCard.setMatched(true);
-                secondCard.setMatched(true);
+            if (first.getName().equals(second.getName())) {
+                first.setMatched(true);
+                second.setMatched(true);
 
                 if (mode == 2) {
-                    if (currentPlayer == 1) scoreP1++;
+                    if (playerTurnQueue.peek() == 1) scoreP1++;
                     else scoreP2++;
                     updateScoreAndTurn();
                 }
 
-                firstCard = null;
-                secondCard = null;
-
                 if (mode == 1 && isGameWon()) {
-                    if (countdownTimer != null) countdownTimer.stop();
+                    stopTimer();
                     showWinDialog();
                 }
-
             } else {
-                Timer flipBackTimer = new Timer(1000, e -> {
-                    firstCard.flipDown();
-                    secondCard.flipDown();
+                javax.swing.Timer flipBackTimer = new javax.swing.Timer(1000, e -> {
+                    first.flipDown();
+                    second.flipDown();
 
                     if (mode == 2) {
-                        currentPlayer = (currentPlayer == 1) ? 2 : 1;
+                        int lastPlayer = playerTurnQueue.poll();
+                        playerTurnQueue.add(lastPlayer);
                         updateScoreAndTurn();
                     }
-
-                    firstCard = null;
-                    secondCard = null;
                 });
                 flipBackTimer.setRepeats(false);
                 flipBackTimer.start();
@@ -134,54 +135,61 @@ public class GamePanel extends JPanel {
     }
 
     private void startCountdownTimer() {
-        countdownTimer = new Timer(1000, e -> {
-            timeLeft--;
-            timerLabel.setText("🕒 Timer: " + timeLeft + " detik");
-
-            if (timeLeft <= 0) {
-                lives--;
-                lifeLabel.setText("❤️ Nyawa: " + lives);
-
-                if (lives <= 0) {
-                    countdownTimer.stop();
-                    JOptionPane.showMessageDialog(this, "Game Over! Kamu kehabisan nyawa.");
-                    GameWindow.getInstance().showMenu();
+        countdownTimer = new Timer();
+        countdownTimer.scheduleAtFixedRate(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTampilanWaktu();
                 } else {
-                    timeLeft = 60;
-                    timerLabel.setText("🕒 Timer: " + timeLeft + " detik");
-                    JOptionPane.showMessageDialog(this, "Waktu Habis! Kamu kehilangan 1 nyawa.");
+                    lives--;
+                    updateTampilanNyawa();
+                    if (lives <= 0) {
+                        stopTimer();
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(GamePanel.this, "Game Over! Kamu kehabisan nyawa.");
+                            GameWindow.getInstance().showMenu();
+                        });
+                    } else {
+                        timeLeft = 60;
+                        updateTampilanWaktu();
+                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(GamePanel.this, "Waktu Habis! Kamu kehilangan 1 nyawa."));
+                    }
                 }
             }
-        });
-        countdownTimer.start();
+        }, 1000, 1000);
+    }
+
+    public void stopTimer() {
+        if (countdownTimer != null) {
+            countdownTimer.cancel();
+        }
+    }
+
+    private void updateTampilanWaktu() {
+        if (timerLabel != null) {
+            timerLabel.setText("🕒 Timer: " + timeLeft + " detik");
+        }
+    }
+
+    private void updateTampilanNyawa() {
+        if (lifeLabel != null) {
+            lifeLabel.setText("❤️ Nyawa: " + lives);
+        }
     }
 
     private void updateScoreAndTurn() {
         if (mode == 2) {
-            turnLabel.setText("👤 Giliran: Player " + currentPlayer);
+            turnLabel.setText("👤 Giliran: Player " + playerTurnQueue.peek());
             scoreLabel.setText("Skor P1: " + scoreP1 + " | Skor P2: " + scoreP2);
         }
     }
 
-    private List<String> generateCardPairs(int totalCards) {
-        String[] possible = {
-                "apple", "avocado", "carrot", "coffe",
-                "hammy", "frog", "eskrim", "depe", "CUPCAKE",
-                "jerapah", "mushroom", "heart", "penguin", "tomat", "watermelon",
-        };
-        List<String> names = new ArrayList<>();
-        for (int i = 0; i < totalCards / 2; i++) {
-            names.add(possible[i]);
-            names.add(possible[i]);
-        }
-        Collections.shuffle(names);
-        return names;
-    }
-
     private ImageIcon loadCardImage(String name) {
         String[] extensions = {".png", ".jpg", ".jpeg"};
-        int desiredWidth = 100;  // Lebar gambar yang kamu inginkan (sesuaikan)
-        int desiredHeight = 100; // Tinggi gambar yang kamu inginkan (sesuaikan)
+        int desiredWidth = 100;
+        int desiredHeight = 100;
 
         for (String ext : extensions) {
             String path = "/assets/cards/" + name + ext;
@@ -194,13 +202,29 @@ public class GamePanel extends JPanel {
             }
         }
 
-        System.err.println("Nggak nemu file gambar untuk: " + name + " (sudah coba .png, .jpg, .jpeg)");
+        System.err.println("Nggak nemu file gambar untuk: " + name);
         BufferedImage placeholder = new BufferedImage(desiredWidth, desiredHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = placeholder.createGraphics();
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, desiredWidth, desiredHeight);
         g.dispose();
         return new ImageIcon(placeholder);
+    }
+
+    private List<String> generateCardPairs(int totalCards) {
+        String[] possible = {
+                "apple", "banana", "cherry", "duck", "fish",
+                "frog", "leaf", "star", "sun", "moon",
+                "cat", "dog", "heart", "ice", "key",
+                "grape", "orange", "pear", "ball", "car"
+        };
+        List<String> names = new ArrayList<>();
+        for (int i = 0; i < totalCards / 2; i++) {
+            names.add(possible[i]);
+            names.add(possible[i]);
+        }
+        Collections.shuffle(names);
+        return names;
     }
 
     private boolean isGameWon() {
