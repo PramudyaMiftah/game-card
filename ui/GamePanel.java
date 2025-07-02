@@ -62,11 +62,14 @@ public class GamePanel extends JPanel {
         ImageIcon backIcon;
         java.net.URL backImgURL = getClass().getResource("/assets/cards/card_back.png");
         if (backImgURL != null) {
-            backIcon = new ImageIcon(backImgURL);
+            ImageIcon originalIcon = new ImageIcon(backImgURL);
+            Image scaledImage = originalIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            backIcon = new ImageIcon(scaledImage);
         } else {
             System.err.println("Nggak nemu file gambar: /assets/cards/card_back.png");
-            backIcon = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB));
+            backIcon = new ImageIcon(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
         }
+
 
         for (String name : cardNames) {
             ImageIcon frontIcon = loadCardImage(name);
@@ -213,10 +216,11 @@ public class GamePanel extends JPanel {
 
     private List<String> generateCardPairs(int totalCards) {
         String[] possible = {
-                "apple", "banana", "cherry", "duck", "fish",
-                "frog", "leaf", "star", "sun", "moon",
-                "cat", "dog", "heart", "ice", "key",
-                "grape", "orange", "pear", "ball", "car"
+                "avocado", "carrot", "coffe", "cupcake", "pig",
+                "eskrim", "hammy", "jerapah", "mushroom", "penguin",
+                "butterfly", "tomat", "watermelon", "bee", "shark",
+                "jellyfish", "kelinci", "meng", "tikus"
+
         };
         List<String> names = new ArrayList<>();
         for (int i = 0; i < totalCards / 2; i++) {
@@ -237,7 +241,7 @@ public class GamePanel extends JPanel {
     private void showWinDialog() {
         int option = JOptionPane.showOptionDialog(
                 this,
-                "🎉 Selamat! Kamu berhasil mencocokkan semua kartu!",
+                "Selamat! Kamu berhasil mencocokkan semua kartu!",
                 "Kamu Menang!",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.INFORMATION_MESSAGE,
