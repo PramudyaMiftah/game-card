@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class GamePanel extends JPanel {
-    private int mode;
-    private int difficulty;
-    private int rows, cols;
+    private final int mode;
+    private final int difficulty;
+    private final int rows;
+    private final int cols;
 
-    private List<CardUI> cards = new ArrayList<>();
-    private Stack<CardUI> openedCards = new Stack<>();
-    private Map<String, Boolean> matchedPairs = new HashMap<>();
+    private final Stack<CardUI> openedCards = new Stack<>();
+    private final Map<String, Boolean> matchedPairs = new HashMap<>();
 
     private int lives = 3;
     private int timeLeft = 60;
@@ -28,8 +28,9 @@ public class GamePanel extends JPanel {
     private JLabel lifeLabel, timerLabel;
 
     private int scoreP1 = 0, scoreP2 = 0;
-    private Queue<Integer> playerTurnQueue = new LinkedList<>();
+    private final Queue<Integer> playerTurnQueue = new LinkedList<>();
     private JLabel turnLabel, scoreLabel;
+    private boolean isChecking = false;
 
     public GamePanel(int mode, int difficulty) {
         this.mode = mode;
@@ -37,7 +38,6 @@ public class GamePanel extends JPanel {
         setLayout(new BorderLayout());
 
         switch (difficulty) {
-            case 0 -> { rows = 4; cols = 4; }
             case 1 -> { rows = 5; cols = 4; }
             case 2 -> { rows = 6; cols = 5; }
             default -> { rows = 4; cols = 4; }
@@ -73,11 +73,12 @@ public class GamePanel extends JPanel {
             backIcon = new ImageIcon(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
         }
 
+        List<CardUI> cards = new ArrayList<>();
 
         for (String name : cardNames) {
             ImageIcon frontIcon = loadCardImage(name);
             CardUI card = new CardUI(name, frontIcon, backIcon);
-            card.getButton().addActionListener(e -> handleCardClick(card));
+            card.getButton().addActionListener(_ -> handleCardClick(card));
             cards.add(card);
             gridPanel.add(card.getButton());
         }
@@ -85,7 +86,7 @@ public class GamePanel extends JPanel {
 
         JPanel bottomPanel = new JPanel();
         JButton backBtn = new JButton("Kembali ke Menu");
-        backBtn.addActionListener(e -> {
+        backBtn.addActionListener(_ -> {
             stopTimer();
             GameWindow.getInstance().showMenu();
         });
@@ -98,7 +99,7 @@ public class GamePanel extends JPanel {
     }
 
     private void handleCardClick(CardUI clicked) {
-        if (clicked.isMatched() || openedCards.contains(clicked) || openedCards.size() >= 2) {
+        if (clicked.isMatched() || openedCards.contains(clicked) || isChecking) {
             return;
         }
 
@@ -106,6 +107,8 @@ public class GamePanel extends JPanel {
         openedCards.push(clicked);
 
         if (openedCards.size() == 2) {
+            isChecking = true;
+
             CardUI second = openedCards.pop();
             CardUI first = openedCards.pop();
 
@@ -114,9 +117,12 @@ public class GamePanel extends JPanel {
                 second.setMatched(true);
                 matchedPairs.put(first.getName(), true);
 
-                if (mode == 2) {
-                    if (playerTurnQueue.peek() == 1) scoreP1++;
-                    else scoreP2++;
+                if (mode == 2 && !playerTurnQueue.isEmpty()) {
+                    if (playerTurnQueue.peek() == 1) {
+                        scoreP1++;
+                    } else {
+                        scoreP2++;
+                    }
                     updateScoreAndTurn();
                 }
 
@@ -124,21 +130,31 @@ public class GamePanel extends JPanel {
                     if (mode == 1) stopTimer();
                     showWinDialog();
                 }
-            } else {
-                javax.swing.Timer flipBackTimer = new javax.swing.Timer(1000, e -> {
-                    first.flipDown();
-                    second.flipDown();
 
-                    if (mode == 2) {
-                        int lastPlayer = playerTurnQueue.poll();
-                        playerTurnQueue.add(lastPlayer);
-                        updateScoreAndTurn();
-                    }
-                });
-                flipBackTimer.setRepeats(false);
+                isChecking = false;
+
+            } else {
+                javax.swing.Timer flipBackTimer = getTimer(first, second);
                 flipBackTimer.start();
             }
         }
+    }
+
+    private javax.swing.Timer getTimer(CardUI first, CardUI second) {
+        javax.swing.Timer flipBackTimer = new javax.swing.Timer(1000, _ -> {
+            first.flipDown();
+            second.flipDown();
+
+            if (mode == 2 && !playerTurnQueue.isEmpty()) {
+                int lastPlayer = playerTurnQueue.poll();
+                playerTurnQueue.add(lastPlayer);
+                updateScoreAndTurn();
+            }
+
+            isChecking = false;
+        });
+        flipBackTimer.setRepeats(false);
+        return flipBackTimer;
     }
 
     private void startCountdownTimer() {

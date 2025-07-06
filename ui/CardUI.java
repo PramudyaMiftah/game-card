@@ -4,11 +4,10 @@ package ui;
 import javax.swing.*;
 
 public class CardUI {
-    private String name;
-    private JButton button;
-    private ImageIcon iconFront; // Gambar depan (isi kartu)
-    private ImageIcon iconBack;  // Gambar belakang (kartu tertutup)
-    private boolean isFaceUp = false;
+    private final String name;
+    private final JButton button;
+    private final ImageIcon iconFront; // Gambar depan (isi kartu)
+    private final ImageIcon iconBack;  // Gambar belakang (kartu tertutup)
     private boolean isMatched = false;
 
     public CardUI(String name, ImageIcon front, ImageIcon back) {
@@ -20,18 +19,15 @@ public class CardUI {
 
     public void flipUp() {
         button.setIcon(iconFront);
-        isFaceUp = true;
     }
 
     public void flipDown() {
         button.setIcon(iconBack);
-        isFaceUp = false;
     }
 
     // --- Getter dan Setter lainnya ---
     public JButton getButton() { return button; }
     public String getName() { return name; }
-    public boolean isFaceUp() { return isFaceUp; }
     public boolean isMatched() { return isMatched; }
     public void setMatched(boolean matched) {
         isMatched = matched;

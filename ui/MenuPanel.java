@@ -16,7 +16,7 @@ public class MenuPanel extends JPanel {
         JButton twoPlayerBtn = new JButton("2 Player");
         JButton exitBtn = new JButton("Keluar");
 
-        onePlayerBtn.addActionListener(e -> {
+        onePlayerBtn.addActionListener(_ -> {
             String[] options = {"Easy (4x4)", "Medium (5x4)", "Hard (6x5)"};
             int difficulty = JOptionPane.showOptionDialog(
                     this,
@@ -34,7 +34,7 @@ public class MenuPanel extends JPanel {
             }
         });
 
-        twoPlayerBtn.addActionListener(e -> {
+        twoPlayerBtn.addActionListener(_ -> {
             String[] options = {"Easy (4x4)", "Medium (5x4)", "Hard (6x5)"};
             int difficulty = JOptionPane.showOptionDialog(
                     this,
@@ -52,7 +52,7 @@ public class MenuPanel extends JPanel {
             }
         });
 
-        exitBtn.addActionListener(e -> System.exit(0));
+        exitBtn.addActionListener(_ -> System.exit(0));
 
         buttonPanel.add(onePlayerBtn);
         buttonPanel.add(twoPlayerBtn);
