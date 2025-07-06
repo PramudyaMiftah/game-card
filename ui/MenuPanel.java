@@ -6,59 +6,35 @@ import java.awt.*;
 public class MenuPanel extends JPanel {
     public MenuPanel() {
         setLayout(new BorderLayout());
+        setBackground(Color.decode("#ADD8E6"));
 
         JLabel title = new JLabel("Memorizing Card", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 32));
         add(title, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+        buttonPanel.setBackground(Color.decode("#ADD8E6"));
         JButton onePlayerBtn = new JButton("1 Player");
+        onePlayerBtn.setBackground(Color.decode("#4682B4"));
+        onePlayerBtn.setForeground(Color.WHITE);
+        onePlayerBtn.setFont(new Font("Arial", Font.BOLD, 32));
+
         JButton twoPlayerBtn = new JButton("2 Player");
+        twoPlayerBtn.setBackground(Color.decode("#4682B4"));
+        twoPlayerBtn.setForeground(Color.WHITE);
+        twoPlayerBtn.setFont(new Font("Arial", Font.BOLD, 32));
+
         JButton exitBtn = new JButton("Keluar");
-
-        onePlayerBtn.addActionListener(_ -> {
-            String[] options = {"Easy (4x4)", "Medium (5x4)", "Hard (6x5)"};
-            int difficulty = JOptionPane.showOptionDialog(
-                    this,
-                    "Pilih Tingkat Kesulitan",
-                    "1 Player Mode",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    options,
-                    options[0]
-            );
-
-            if (difficulty != -1) {
-                GameWindow.getInstance().showGame(1, difficulty);
-            }
-        });
-
-        twoPlayerBtn.addActionListener(_ -> {
-            String[] options = {"Easy (4x4)", "Medium (5x4)", "Hard (6x5)"};
-            int difficulty = JOptionPane.showOptionDialog(
-                    this,
-                    "Pilih Tingkat Kesulitan",
-                    "2 Player Mode",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    options,
-                    options[0]
-            );
-
-            if (difficulty != -1) {
-                GameWindow.getInstance().showGame(2, difficulty);
-            }
-        });
-
-        exitBtn.addActionListener(_ -> System.exit(0));
+        exitBtn.setBackground(Color.decode("#4682B4"));
+        exitBtn.setForeground(Color.WHITE);
+        exitBtn.setFont(new Font("Arial", Font.BOLD, 32));
 
         buttonPanel.add(onePlayerBtn);
         buttonPanel.add(twoPlayerBtn);
         buttonPanel.add(exitBtn);
 
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.setBackground(Color.decode("#ADD8E6"));
         wrapperPanel.add(buttonPanel);
         add(wrapperPanel, BorderLayout.CENTER);
     }
