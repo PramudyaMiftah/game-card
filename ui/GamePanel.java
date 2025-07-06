@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.Timer;
+import java.util.Map;
+import java.util.HashMap;
 
 public class GamePanel extends JPanel {
     private int mode;
@@ -18,6 +20,7 @@ public class GamePanel extends JPanel {
 
     private List<CardUI> cards = new ArrayList<>();
     private Stack<CardUI> openedCards = new Stack<>();
+    private Map<String, Boolean> matchedPairs = new HashMap<>();
 
     private int lives = 3;
     private int timeLeft = 60;
@@ -109,6 +112,7 @@ public class GamePanel extends JPanel {
             if (first.getName().equals(second.getName())) {
                 first.setMatched(true);
                 second.setMatched(true);
+                matchedPairs.put(first.getName(), true);
 
                 if (mode == 2) {
                     if (playerTurnQueue.peek() == 1) scoreP1++;
@@ -116,8 +120,8 @@ public class GamePanel extends JPanel {
                     updateScoreAndTurn();
                 }
 
-                if (mode == 1 && isGameWon()) {
-                    stopTimer();
+                if (isGameWon()) {
+                    if (mode == 1) stopTimer();
                     showWinDialog();
                 }
             } else {
@@ -232,10 +236,7 @@ public class GamePanel extends JPanel {
     }
 
     private boolean isGameWon() {
-        for (CardUI card : cards) {
-            if (!card.isMatched()) return false;
-        }
-        return true;
+        return matchedPairs.size() == (rows * cols) / 2;
     }
 
     private void showWinDialog() {
