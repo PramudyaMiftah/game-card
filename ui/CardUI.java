@@ -14,7 +14,13 @@ public class CardUI {
         this.name = name;
         this.iconFront = front;
         this.iconBack = back;
-        this.button = new JButton(iconBack); // Awalnya tampilkan gambar belakang
+        this.button = new JButton(iconBack);
+
+        // Buat tombol transparan
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setOpaque(false);
     }
 
     public void flipUp() {

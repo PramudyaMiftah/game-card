@@ -47,12 +47,12 @@ public class GamePanel extends JPanel {
 
         switch (difficulty) {
             case 1 -> { rows = 5; cols = 4; } // Medium
-            case 2 -> { rows = 6; cols = 5; } // Hard
+            case 2 -> { rows = 6; cols = 4; } // Hard
             default -> { rows = 4; cols = 4; } // Easy
         }
 
         // --- Panel Atas (Info Pemain, Skor, Waktu) ---
-        JPanel topPanel = new JPanel(new GridLayout(1, mode == 1 ? 3 : 2, 10, 0));
+        JPanel topPanel = new JPanel(new GridLayout(1, mode == 1 ? 3 : 2, 10, 20));
         topPanel.setBackground(Color.decode("#ADD8E6"));
         if (mode == 1) {
             lifeLabel = new JLabel("❤️ Nyawa: " + lives);
@@ -74,7 +74,7 @@ public class GamePanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // --- Panel Kartu (Grid Permainan) ---
-        JPanel gridPanel = new JPanel(new GridLayout(rows, cols, 10, 10));
+        JPanel gridPanel = new JPanel(new GridLayout(rows, cols, 5, 5));
         gridPanel.setBackground(Color.decode("#ADD8E6"));
         List<String> cardNames = generateCardPairs(rows * cols);
         ImageIcon backIcon = loadCardImage("/assets/cards/card_back.png", true);
@@ -85,7 +85,13 @@ public class GamePanel extends JPanel {
             card.getButton().addActionListener(_ -> handleCardClick(card));
             gridPanel.add(card.getButton());
         }
-        add(gridPanel, BorderLayout.CENTER);
+        JPanel wrapper = new JPanel(new BorderLayout()); // Bungkus grid
+        wrapper.setBorder(BorderFactory.createEmptyBorder(100, 300, 20, 300));
+        wrapper.setOpaque(false); // Biar transparan kalau ada background
+
+        wrapper.add(gridPanel, BorderLayout.CENTER); // Masukkan grid ke tengah wrapper
+        add(wrapper, BorderLayout.CENTER); // Masukkan wrapper ke layout utama
+
 
         // --- Panel Bawah (Tombol Kembali) ---
         JPanel bottomPanel = new JPanel();
@@ -219,14 +225,14 @@ public class GamePanel extends JPanel {
 
         if (imgURL != null) {
             ImageIcon originalIcon = new ImageIcon(imgURL);
-            Image scaledImage = originalIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+            Image scaledImage = originalIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImage);
         } else {
             System.err.println("Nggak nemu file gambar untuk: " + path);
-            BufferedImage placeholder = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
+            BufferedImage placeholder = new BufferedImage(150, 150, BufferedImage.TYPE_INT_RGB);
             Graphics2D g = placeholder.createGraphics();
             g.setColor(Color.BLUE);
-            g.fillRect(0, 0, 200, 200);
+            g.fillRect(0, 0, 150, 150);
             g.dispose();
             return new ImageIcon(placeholder);
         }
