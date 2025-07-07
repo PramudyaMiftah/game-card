@@ -46,8 +46,8 @@ public class GamePanel extends JPanel {
         setBackground(Color.decode("#ADD8E6"));
 
         switch (difficulty) {
-            case 1 -> { rows = 5; cols = 4; } // Medium
-            case 2 -> { rows = 6; cols = 4; } // Hard
+            case 1 -> { rows = 4; cols = 5; } // Medium
+            case 2 -> { rows = 4; cols = 6; } // Hard
             default -> { rows = 4; cols = 4; } // Easy
         }
 
