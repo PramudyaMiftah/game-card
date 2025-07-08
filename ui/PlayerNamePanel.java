@@ -4,12 +4,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import assetsmanager.VideoManager;
 
 public class PlayerNamePanel extends JPanel {
+
+    private final ImageIcon backgroundGif;
+
     public PlayerNamePanel(int mode, int difficulty) {
         setLayout(new GridBagLayout());
         setBackground(Color.decode("#ADD8E6"));
         GridBagConstraints gbc = new GridBagConstraints();
+
+        backgroundGif = VideoManager.loadImageIcon("menu-utama.gif");
 
         // Pengaturan Ukuran & Font standar
         Dimension componentSize = new Dimension(280, 40);
@@ -59,7 +65,7 @@ public class PlayerNamePanel extends JPanel {
         gbc.gridy++;
         gbc.insets = new Insets(20, 0, 0, 0); // Jarak atas dari field terakhir
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
-        actionPanel.setBackground(Color.decode("#ADD8E6"));
+        actionPanel.setOpaque(false);
 
         Dimension buttonSize = new Dimension(130, 40); // Tombol sedikit lebih kecil
         Font buttonFont = Menu.DISPLAY_FONT_BUTTON;
@@ -103,5 +109,14 @@ public class PlayerNamePanel extends JPanel {
         });
 
         backButton.addActionListener(_ -> GameWindow.getInstance().showDifficultySelection(mode));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundGif != null) {
+            // Gambar GIF di seluruh area panel
+            g.drawImage(backgroundGif.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }

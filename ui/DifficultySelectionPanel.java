@@ -2,12 +2,18 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
+import assetsmanager.VideoManager;
 
 public class DifficultySelectionPanel extends JPanel {
+
+    private final ImageIcon backgroundGif;
+
     public DifficultySelectionPanel(int mode) {
         setLayout(new GridBagLayout());
         setBackground(Color.decode("#ADD8E6"));
         GridBagConstraints gbc = new GridBagConstraints();
+
+        backgroundGif = VideoManager.loadImageIcon("menu-utama.gif");
 
         // Judul
         gbc.gridy = 0;
@@ -60,5 +66,14 @@ public class DifficultySelectionPanel extends JPanel {
         backButton.setForeground(Color.WHITE);
         backButton.addActionListener(_ -> GameWindow.getInstance().showModeSelection());
         add(backButton, gbc);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundGif != null) {
+            // Gambar GIF di seluruh area panel
+            g.drawImage(backgroundGif.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }

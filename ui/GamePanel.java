@@ -36,7 +36,6 @@ public class GamePanel extends JPanel {
     private JLabel turnLabel, scoreLabel;
     private boolean isChecking = false;
 
-    // --- Constructor telah diubah untuk menerima nama pemain ---
     public GamePanel(int mode, int difficulty, String player1Name, String player2Name) {
         this.mode = mode;
         this.difficulty = difficulty;
@@ -53,14 +52,13 @@ public class GamePanel extends JPanel {
         }
 
         // --- Panel Atas (Info Pemain, Skor, Waktu) ---
-        JPanel topPanel = new JPanel(new BorderLayout(10, 0)); // Beri sedikit jarak antar komponen
-        topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Beri padding
+        JPanel topPanel = new JPanel(new BorderLayout(10, 0));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         topPanel.setBackground(Color.decode("#4682B4"));
-        Font statusFont = Menu.DISPLAY_FONT_BUTTON; //
+        Font statusFont = Menu.DISPLAY_FONT_BUTTON;
         Color fontColor = Color.WHITE;
 
-        if (mode == 1) { // Tampilan untuk Mode Single Player
-            // Inisialisasi variabel instance langsung
+        if (mode == 1) {
             lifeLabel = new JLabel("❤️ Nyawa: " + lives);
             lifeLabel.setFont(statusFont);
             lifeLabel.setForeground(fontColor);
@@ -68,25 +66,22 @@ public class GamePanel extends JPanel {
             timerLabel = new JLabel("🕒 Timer: " + timeLeft + " detik");
             timerLabel.setFont(statusFont);
             timerLabel.setForeground(fontColor);
-            timerLabel.setHorizontalAlignment(JLabel.CENTER); // Ratakan tengah
+            timerLabel.setHorizontalAlignment(JLabel.CENTER);
 
             JLabel levelLabel = new JLabel("⭐ Level: " + getDifficultyLabel());
             levelLabel.setFont(statusFont);
             levelLabel.setForeground(fontColor);
             levelLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-            // Tambahkan ke posisi yang benar
             topPanel.add(lifeLabel, BorderLayout.WEST);
             topPanel.add(timerLabel, BorderLayout.CENTER);
             topPanel.add(levelLabel, BorderLayout.EAST);
 
-        } else { // Tampilan untuk Mode Two Players
-            // PENTING: Mengosongkan dan mengatur ulang antrian untuk game 2P baru
+        } else {
             playerTurnQueue.clear();
             playerTurnQueue.add(1);
             playerTurnQueue.add(2);
 
-            // Inisialisasi variabel instance
             turnLabel = new JLabel("👤 Giliran: " + this.player1Name);
             turnLabel.setFont(statusFont);
             turnLabel.setForeground(fontColor);
@@ -94,9 +89,8 @@ public class GamePanel extends JPanel {
             scoreLabel = new JLabel("Skor " + this.player1Name + ": " + scoreP1 + " | Skor " + this.player2Name + ": " + scoreP2);
             scoreLabel.setFont(statusFont);
             scoreLabel.setForeground(fontColor);
-            scoreLabel.setHorizontalAlignment(JLabel.RIGHT); // Ratakan kanan
+            scoreLabel.setHorizontalAlignment(JLabel.RIGHT);
 
-            // Tambahkan ke posisi yang benar
             topPanel.add(turnLabel, BorderLayout.WEST);
             topPanel.add(scoreLabel, BorderLayout.EAST);
         }
@@ -114,7 +108,7 @@ public class GamePanel extends JPanel {
             card.getButton().addActionListener(_ -> handleCardClick(card));
             gridPanel.add(card.getButton());
         }
-        JPanel wrapper = new JPanel(new BorderLayout()); // Bungkus grid
+        JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBorder(BorderFactory.createEmptyBorder(100, 300, 20, 300));
         wrapper.setOpaque(false); // Biar transparan kalau ada background
 
@@ -164,7 +158,6 @@ public class GamePanel extends JPanel {
                     updateScoreAndTurn();
                 }
 
-                // UBAH BAGIAN INI
                 if (isGameWon()) {
                     // Pindahkan ke invokeLater agar event klik selesai dulu baru dialog muncul
                     SwingUtilities.invokeLater(() -> {
@@ -189,7 +182,6 @@ public class GamePanel extends JPanel {
         }
     }
 
-    // GANTI DENGAN KODE BARU INI
     private void startCountdownTimer() {
         // Parameter: delay 1000ms (1 detik), dan aksi yang dijalankan setiap detiknya
         countdownTimer = new Timer(1000, _ -> {

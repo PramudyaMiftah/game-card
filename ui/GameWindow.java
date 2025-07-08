@@ -1,11 +1,16 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import assetsmanager.SoundManager;
 
 public class GameWindow extends JFrame {
+
+    private final ImageIcon backgroundGif;
     private static GameWindow instance;
 
     // Variabel untuk CardLayout
@@ -27,9 +32,19 @@ public class GameWindow extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setUndecorated(true);
 
+        backgroundGif = assetsmanager.VideoManager.loadImageIcon("menu-utama.gif");
         // Inisialisasi CardLayout dan panel utama yang akan menampung semua "layar"
         cardLayout = new CardLayout();
-        mainPanel = new JPanel(cardLayout);
+        mainPanel = new JPanel(cardLayout){
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                // Logika menggambar GIF sekarang ada di sini
+                if (backgroundGif != null) {
+                    g.drawImage(backgroundGif.getImage(), 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
 
         // Tambahkan panel-panel yang statis (selalu ada)
         mainPanel.add(new PlayPanel(), "play");
@@ -42,16 +57,27 @@ public class GameWindow extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    int choice = JOptionPane.showConfirmDialog(
+                    String[] options = {"Kembali ke Menu", "Keluar dari Game", "Batal"};
+                    int choice = JOptionPane.showOptionDialog(
                             GameWindow.this,
-                            "Apakah kamu yakin ingin keluar dari permainan?",
+                            "Ingin keluar?",
                             "Konfirmasi Keluar",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            options,
+                            options[2]
                     );
-
-                    if (choice == JOptionPane.YES_OPTION) {
-                        System.exit(0); // Tutup aplikasi jika user memilih "Yes"
+                    switch (choice) {
+                        case 0:
+                            showPlayPanel();
+                            break;
+                        case 1:
+                            System.exit(0);
+                            break;
+                        case 2:
+                        case JOptionPane.CLOSED_OPTION:
+                            break;
                     }
                 }
             }
@@ -73,6 +99,7 @@ public class GameWindow extends JFrame {
 
     // Method-method lama sekarang memanggil showCard atau membuat panel baru
     public void showPlayPanel() {
+        SoundManager.loopMusic("menu-music.wav");
         showCard("play");
     }
 
@@ -100,7 +127,7 @@ public class GameWindow extends JFrame {
     }
 
     public void showGame(int mode, int difficulty, String player1Name, String player2Name) {
-        // GamePanel selalu dibuat baru setiap game dimulai
+        SoundManager.stopMusic();
         GamePanel gamePanel = new GamePanel(mode, difficulty, player1Name, player2Name);
         mainPanel.add(gamePanel, "game");
         showCard("game");

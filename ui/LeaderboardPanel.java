@@ -1,15 +1,20 @@
 package ui;
 import leaderboard.LeaderboardManager;
 import leaderboard.ScoreEntry;
+import assetsmanager.VideoManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 public class LeaderboardPanel extends JPanel {
+
+    private final ImageIcon backgroundGif;
+
     public LeaderboardPanel() {
         setLayout(new BorderLayout());
-        setBackground(Color.decode("#ADD8E6")); // keep game background color
+
+        backgroundGif = VideoManager.loadImageIcon("menu-utama.gif");
 
         // ----- Title ------------------------------------------------------
         JLabel title = new JLabel("HIGH SCORES", SwingConstants.CENTER);
@@ -112,5 +117,14 @@ public class LeaderboardPanel extends JPanel {
             case 3 -> n + "RD";
             default -> n + "TH";
         };
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundGif != null) {
+            // Gambar GIF di seluruh area panel
+            g.drawImage(backgroundGif.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }
