@@ -32,7 +32,7 @@ public class GameWindow extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setUndecorated(true);
 
-        backgroundGif = assetsmanager.VideoManager.loadImageIcon("menu-utama.gif");
+        backgroundGif = assetsmanager.VideoManager.loadImageIcon("menu-utama-sakura.gif");
         // Inisialisasi CardLayout dan panel utama yang akan menampung semua "layar"
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout){
@@ -97,9 +97,8 @@ public class GameWindow extends JFrame {
         requestFocusInWindow();
     }
 
-    // Method-method lama sekarang memanggil showCard atau membuat panel baru
     public void showPlayPanel() {
-        SoundManager.loopMusic("menu-music.wav");
+        SoundManager.loopMusic("watflo.wav");
         showCard("play");
     }
 
@@ -127,6 +126,7 @@ public class GameWindow extends JFrame {
     }
 
     public void showGame(int mode, int difficulty, String player1Name, String player2Name) {
+        SoundManager.loopMusic("gameplay-music.wav");
         SoundManager.stopMusic();
         GamePanel gamePanel = new GamePanel(mode, difficulty, player1Name, player2Name);
         mainPanel.add(gamePanel, "game");

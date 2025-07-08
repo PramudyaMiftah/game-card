@@ -13,6 +13,7 @@ import java.util.Stack;
 import java.util.Map;
 import java.util.HashMap;
 import leaderboard.LeaderboardManager;
+import assetsmanager.SoundManager;
 
 public class GamePanel extends JPanel {
     private final int mode;
@@ -195,6 +196,7 @@ public class GamePanel extends JPanel {
 
                 if (lives <= 0) {
                     countdownTimer.stop(); // Hentikan timer sebelum pindah window
+                    SoundManager.playSound("game-over.wav");
                     JOptionPane.showMessageDialog(this, "Game Over! Kamu kehabisan nyawa.", "Game Over", JOptionPane.ERROR_MESSAGE);
                     GameWindow.getInstance().showMenu();
                 } else {
@@ -281,12 +283,10 @@ public class GamePanel extends JPanel {
     }
 
     private void showWinDialog() {
+        SoundManager.playSound("win.wav");
         String message;
         if (mode == 1) {
             message = "Selamat " + player1Name + "! Kamu berhasil mencocokkan semua kartu!";
-
-            // --- TAMBAHKAN KODE INI ---
-            // Simpan skor untuk mode single player (mode 1)
             int finalScore = lives * timeLeft; // Contoh perhitungan skor
             LeaderboardManager.addScore(player1Name, finalScore);
             // -------------------------

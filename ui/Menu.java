@@ -14,7 +14,9 @@ public class Menu {
     public static Font DISPLAY_FONT_MEDIUM;
     public static Font DISPLAY_FONT_BUTTON;
 
-    public static final Color WARNA_JUDUL = Color.decode("#819067"); // hijauuuu
+    public static final Color WARNA_JUDUL = Color.decode("#5EABD6"); // hijauuuu
+    public static final Color WARNA_SUBJUDUL = Color.decode("#FFC7ED"); // hijauuuu
+    public static final Color WARNA_OPTIONS = Color.decode("#FFC7ED"); // hijauuuu
     public static final Color WARNA_TEKS_UTAMA = Color.WHITE;
     public static final Color WARNA_TOMBOL_MERAH = Color.decode("#DC143C");
     public static final Color WARNA_TOMBOL_BIRU = Color.decode("#4682B4");
@@ -22,7 +24,7 @@ public class Menu {
     // Static initializer block: Kode ini akan dijalankan satu kali saat kelas dimuat
     static {
         try {
-            PIXEL_FONT_BASE = Font.createFont(Font.TRUETYPE_FONT, Menu.class.getResourceAsStream("/assets/fonts/game-paused.otf"));
+            PIXEL_FONT_BASE = Font.createFont(Font.TRUETYPE_FONT, Menu.class.getResourceAsStream("/assets/fonts/pixel-gamer.otf"));
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(PIXEL_FONT_BASE);
 

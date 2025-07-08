@@ -15,7 +15,7 @@ public class PlayerNamePanel extends JPanel {
         setBackground(Color.decode("#ADD8E6"));
         GridBagConstraints gbc = new GridBagConstraints();
 
-        backgroundGif = VideoManager.loadImageIcon("menu-utama.gif");
+        backgroundGif = VideoManager.loadImageIcon("menu-utama-sakura.gif");
 
         // Pengaturan Ukuran & Font standar
         Dimension componentSize = new Dimension(280, 40);

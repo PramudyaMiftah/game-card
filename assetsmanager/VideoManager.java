@@ -7,7 +7,7 @@ public class VideoManager {
 
     public static ImageIcon loadImageIcon(String fileName) {
         try {
-            URL imgURL = VideoManager.class.getResource("/assets/gif/menu-utama.gif");
+            URL imgURL = VideoManager.class.getResource("/assets/gif/" + fileName);
             if (imgURL != null) {
                 return new ImageIcon(imgURL);
             } else {

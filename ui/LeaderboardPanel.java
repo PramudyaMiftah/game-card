@@ -14,7 +14,7 @@ public class LeaderboardPanel extends JPanel {
     public LeaderboardPanel() {
         setLayout(new BorderLayout());
 
-        backgroundGif = VideoManager.loadImageIcon("menu-utama.gif");
+        backgroundGif = VideoManager.loadImageIcon("menu-utama-sakura.gif");
 
         // ----- Title ------------------------------------------------------
         JLabel title = new JLabel("HIGH SCORES", SwingConstants.CENTER);

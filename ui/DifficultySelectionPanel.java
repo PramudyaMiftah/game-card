@@ -1,79 +1,36 @@
 package ui;
 
 import javax.swing.*;
-import java.awt.*;
-import assetsmanager.VideoManager;
 
-public class DifficultySelectionPanel extends JPanel {
+public class DifficultySelectionPanel extends AbstractMenuPanel {
 
-    private final ImageIcon backgroundGif;
+    private final int mode; // Simpan mode yang dipilih dari layar sebelumnya
 
     public DifficultySelectionPanel(int mode) {
-        setLayout(new GridBagLayout());
-        setBackground(Color.decode("#ADD8E6"));
-        GridBagConstraints gbc = new GridBagConstraints();
+        // 1. Panggil konstruktor parent
+        super("menu-utama-sakura.gif"); // Ganti nama GIF jika perlu
+        this.mode = mode;
 
-        backgroundGif = VideoManager.loadImageIcon("menu-utama.gif");
-
-        // Judul
-        gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, 50, 0);
-        JLabel title = new JLabel("Pilih Tingkat Kesulitan", SwingConstants.CENTER);
-        title.setFont(Menu.DISPLAY_FONT_LARGE);
-        add(title, gbc);
-
-        // Pengaturan standar
-        Dimension buttonSize = new Dimension(250, 40);
-        Font buttonFont = Menu.DISPLAY_FONT_BUTTON;
-        gbc.insets = new Insets(0, 0, 15, 0);
-
-        // Tombol Easy
-        gbc.gridy = 1;
-        JButton easyBtn = new JButton("Easy");
-        easyBtn.setPreferredSize(buttonSize);
-        easyBtn.setFont(buttonFont);
-        easyBtn.setBackground(Color.decode("#4682B4"));
-        easyBtn.setForeground(Color.WHITE);
-        easyBtn.addActionListener(_ -> GameWindow.getInstance().showPlayerNameInput(mode, 0));
-        add(easyBtn, gbc);
-
-        // Tombol Medium
-        gbc.gridy = 2;
-        JButton mediumBtn = new JButton("Medium");
-        mediumBtn.setPreferredSize(buttonSize);
-        mediumBtn.setFont(buttonFont);
-        mediumBtn.setBackground(Color.decode("#4682B4"));
-        mediumBtn.setForeground(Color.WHITE);
-        mediumBtn.addActionListener(_ -> GameWindow.getInstance().showPlayerNameInput(mode, 1));
-        add(mediumBtn, gbc);
-
-        // Tombol Hard
-        gbc.gridy = 3;
-        JButton hardBtn = new JButton("Hard");
-        hardBtn.setPreferredSize(buttonSize);
-        hardBtn.setFont(buttonFont);
-        hardBtn.setBackground(Color.decode("#4682B4"));
-        hardBtn.setForeground(Color.WHITE);
-        hardBtn.addActionListener(_ -> GameWindow.getInstance().showPlayerNameInput(mode, 2));
-        add(hardBtn, gbc);
-
-        // Tombol Kembali
-        gbc.gridy = 4;
-        JButton backButton = new JButton("Kembali");
-        backButton.setPreferredSize(buttonSize);
-        backButton.setFont(buttonFont);
-        backButton.setBackground(Color.decode("#696969"));
-        backButton.setForeground(Color.WHITE);
-        backButton.addActionListener(_ -> GameWindow.getInstance().showModeSelection());
-        add(backButton, gbc);
+        // 2. Tentukan pilihan menu untuk panel ini
+        this.menuOptions = new String[]{"Easy", "Medium", "Hard", "Kembali"};
     }
 
+    // 3. Implementasikan apa yang terjadi saat Enter ditekan
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (backgroundGif != null) {
-            // Gambar GIF di seluruh area panel
-            g.drawImage(backgroundGif.getImage(), 0, 0, getWidth(), getHeight(), this);
+    protected void onEnterPressed() {
+        switch (selectedIndex) {
+            case 0: // Easy
+                GameWindow.getInstance().showPlayerNameInput(this.mode, 0);
+                break;
+            case 1: // Medium
+                GameWindow.getInstance().showPlayerNameInput(this.mode, 1);
+                break;
+            case 2: // Hard
+                GameWindow.getInstance().showPlayerNameInput(this.mode, 2);
+                break;
+            case 3: // Kembali
+                GameWindow.getInstance().showModeSelection();
+                break;
         }
     }
 }
