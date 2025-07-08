@@ -13,12 +13,12 @@ public class ModeSelectionPanel extends JPanel {
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 50, 0);
         JLabel title = new JLabel("Pilih Mode", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 32));
+        title.setFont(Menu.DISPLAY_FONT_LARGE);
         add(title, gbc);
 
         // Pengaturan standar
         Dimension buttonSize = new Dimension(250, 40);
-        Font buttonFont = new Font("Arial", Font.BOLD, 16);
+        Font buttonFont = Menu.DISPLAY_FONT_BUTTON;
         gbc.insets = new Insets(0, 0, 15, 0);
 
         // Tombol 1 Player

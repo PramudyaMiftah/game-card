@@ -13,8 +13,8 @@ public class PlayerNamePanel extends JPanel {
 
         // Pengaturan Ukuran & Font standar
         Dimension componentSize = new Dimension(280, 40);
-        Font labelFont = new Font("Arial", Font.BOLD, 16);
-        Font fieldFont = new Font("Arial", Font.PLAIN, 16);
+        Font labelFont = Menu.DISPLAY_FONT_MEDIUM;
+        Font fieldFont = Menu.DISPLAY_FONT_BUTTON;
 
         gbc.insets = new Insets(0, 0, 5, 0); // Jarak antar label dan field
         gbc.gridx = 0;
@@ -62,7 +62,7 @@ public class PlayerNamePanel extends JPanel {
         actionPanel.setBackground(Color.decode("#ADD8E6"));
 
         Dimension buttonSize = new Dimension(130, 40); // Tombol sedikit lebih kecil
-        Font buttonFont = new Font("Arial", Font.BOLD, 14);
+        Font buttonFont = Menu.DISPLAY_FONT_BUTTON;
 
         // Tombol Kembali
         JButton backButton = new JButton("Kembali");

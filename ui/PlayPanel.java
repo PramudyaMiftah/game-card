@@ -14,12 +14,12 @@ public class PlayPanel extends JPanel {
         gbc.gridy = 0; // Baris 0
         gbc.insets = new Insets(0, 0, 50, 0); // Jarak bawah 50px
         JLabel titleLabel = new JLabel("Memorizing Card", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
+        titleLabel.setFont(Menu.DISPLAY_FONT_LARGE);
         add(titleLabel, gbc);
 
         // Ukuran standar untuk semua tombol
         Dimension buttonSize = new Dimension(250, 40);
-        Font buttonFont = new Font("Arial", Font.BOLD, 16);
+        Font buttonFont = Menu.DISPLAY_FONT_BUTTON;
 
         // Tombol Play
         gbc.gridy = 1; // Baris 1
@@ -32,8 +32,17 @@ public class PlayPanel extends JPanel {
         playButton.addActionListener(_ -> GameWindow.getInstance().showModeSelection());
         add(playButton, gbc);
 
+        gbc.gridy = 2; // Baris 1
+        JButton leaderboardButton = new JButton("HIGH SCORES");
+        leaderboardButton.setPreferredSize(buttonSize);
+        leaderboardButton.setFont(buttonFont);
+        leaderboardButton.setBackground(Color.decode("#4682B4"));
+        leaderboardButton.setForeground(Color.WHITE);
+        leaderboardButton.addActionListener(_ -> GameWindow.getInstance().showLeaderboard());
+        add(leaderboardButton, gbc);
+
         // Tombol Keluar
-        gbc.gridy = 2; // Baris 2
+        gbc.gridy = 3; // Baris 2
         JButton exitButton = new JButton("Keluar");
         exitButton.setPreferredSize(buttonSize);
         exitButton.setFont(buttonFont);
@@ -43,3 +52,4 @@ public class PlayPanel extends JPanel {
         add(exitButton, gbc);
     }
 }
+

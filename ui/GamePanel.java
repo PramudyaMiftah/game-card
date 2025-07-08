@@ -1,6 +1,7 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -9,9 +10,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
-import java.util.Timer;
 import java.util.Map;
 import java.util.HashMap;
+import leaderboard.LeaderboardManager;
 
 public class GamePanel extends JPanel {
     private final int mode;
@@ -52,24 +53,52 @@ public class GamePanel extends JPanel {
         }
 
         // --- Panel Atas (Info Pemain, Skor, Waktu) ---
-        JPanel topPanel = new JPanel(new GridLayout(1, mode == 1 ? 3 : 2, 10, 20));
-        topPanel.setBackground(Color.decode("#ADD8E6"));
-        if (mode == 1) {
+        JPanel topPanel = new JPanel(new BorderLayout(10, 0)); // Beri sedikit jarak antar komponen
+        topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Beri padding
+        topPanel.setBackground(Color.decode("#4682B4"));
+        Font statusFont = Menu.DISPLAY_FONT_BUTTON; //
+        Color fontColor = Color.WHITE;
+
+        if (mode == 1) { // Tampilan untuk Mode Single Player
+            // Inisialisasi variabel instance langsung
             lifeLabel = new JLabel("❤️ Nyawa: " + lives);
+            lifeLabel.setFont(statusFont);
+            lifeLabel.setForeground(fontColor);
+
             timerLabel = new JLabel("🕒 Timer: " + timeLeft + " detik");
-            topPanel.add(lifeLabel);
-            topPanel.add(timerLabel);
-            topPanel.add(new JLabel("⭐ Level: " + getDifficultyLabel()));
-        } else {
+            timerLabel.setFont(statusFont);
+            timerLabel.setForeground(fontColor);
+            timerLabel.setHorizontalAlignment(JLabel.CENTER); // Ratakan tengah
+
+            JLabel levelLabel = new JLabel("⭐ Level: " + getDifficultyLabel());
+            levelLabel.setFont(statusFont);
+            levelLabel.setForeground(fontColor);
+            levelLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
+            // Tambahkan ke posisi yang benar
+            topPanel.add(lifeLabel, BorderLayout.WEST);
+            topPanel.add(timerLabel, BorderLayout.CENTER);
+            topPanel.add(levelLabel, BorderLayout.EAST);
+
+        } else { // Tampilan untuk Mode Two Players
             // PENTING: Mengosongkan dan mengatur ulang antrian untuk game 2P baru
             playerTurnQueue.clear();
             playerTurnQueue.add(1);
             playerTurnQueue.add(2);
 
+            // Inisialisasi variabel instance
             turnLabel = new JLabel("👤 Giliran: " + this.player1Name);
-            scoreLabel = new JLabel("Skor " + this.player1Name + ": 0 | Skor " + this.player2Name + ": 0");
-            topPanel.add(turnLabel);
-            topPanel.add(scoreLabel);
+            turnLabel.setFont(statusFont);
+            turnLabel.setForeground(fontColor);
+
+            scoreLabel = new JLabel("Skor " + this.player1Name + ": " + scoreP1 + " | Skor " + this.player2Name + ": " + scoreP2);
+            scoreLabel.setFont(statusFont);
+            scoreLabel.setForeground(fontColor);
+            scoreLabel.setHorizontalAlignment(JLabel.RIGHT); // Ratakan kanan
+
+            // Tambahkan ke posisi yang benar
+            topPanel.add(turnLabel, BorderLayout.WEST);
+            topPanel.add(scoreLabel, BorderLayout.EAST);
         }
         add(topPanel, BorderLayout.NORTH);
 
@@ -135,9 +164,13 @@ public class GamePanel extends JPanel {
                     updateScoreAndTurn();
                 }
 
+                // UBAH BAGIAN INI
                 if (isGameWon()) {
-                    if (mode == 1) stopTimer();
-                    showWinDialog();
+                    // Pindahkan ke invokeLater agar event klik selesai dulu baru dialog muncul
+                    SwingUtilities.invokeLater(() -> {
+                        if (mode == 1) stopTimer();
+                        showWinDialog();
+                    });
                 }
                 isChecking = false;
             } else { // Kartu tidak cocok
@@ -156,37 +189,34 @@ public class GamePanel extends JPanel {
         }
     }
 
+    // GANTI DENGAN KODE BARU INI
     private void startCountdownTimer() {
-        countdownTimer = new Timer();
-        countdownTimer.scheduleAtFixedRate(new java.util.TimerTask() {
-            @Override
-            public void run() {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    updateTampilanWaktu();
+        // Parameter: delay 1000ms (1 detik), dan aksi yang dijalankan setiap detiknya
+        countdownTimer = new Timer(1000, _ -> {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateTampilanWaktu();
+            } else {
+                lives--;
+                updateTampilanNyawa();
+                timeLeft = 60; // Reset waktu untuk kesempatan berikutnya
+
+                if (lives <= 0) {
+                    countdownTimer.stop(); // Hentikan timer sebelum pindah window
+                    JOptionPane.showMessageDialog(this, "Game Over! Kamu kehabisan nyawa.", "Game Over", JOptionPane.ERROR_MESSAGE);
+                    GameWindow.getInstance().showMenu();
                 } else {
-                    lives--;
-                    updateTampilanNyawa();
-                    if (lives <= 0) {
-                        stopTimer();
-                        SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(GamePanel.this, "Game Over! Kamu kehabisan nyawa.");
-                            GameWindow.getInstance().showMenu();
-                        });
-                    } else {
-                        timeLeft = 60;
-                        updateTampilanWaktu();
-                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(GamePanel.this, "Waktu Habis! Kamu kehilangan 1 nyawa."));
-                    }
+                    // Timer akan terus berjalan untuk nyawa berikutnya
+                    JOptionPane.showMessageDialog(this, "Waktu Habis! Kamu kehilangan 1 nyawa.", "Waktu Habis", JOptionPane.WARNING_MESSAGE);
                 }
             }
-        }, 1000, 1000);
+        });
+        countdownTimer.start(); // Mulai timer
     }
 
     public void stopTimer() {
-        if (countdownTimer != null) {
-            countdownTimer.cancel();
-            countdownTimer = null; // Set ke null untuk mencegah error
+        if (countdownTimer != null && countdownTimer.isRunning()) {
+            countdownTimer.stop(); // Method untuk menghentikannya adalah .stop()
         }
     }
 
@@ -262,11 +292,23 @@ public class GamePanel extends JPanel {
         String message;
         if (mode == 1) {
             message = "Selamat " + player1Name + "! Kamu berhasil mencocokkan semua kartu!";
+
+            // --- TAMBAHKAN KODE INI ---
+            // Simpan skor untuk mode single player (mode 1)
+            int finalScore = lives * timeLeft; // Contoh perhitungan skor
+            LeaderboardManager.addScore(player1Name, finalScore);
+            // -------------------------
+
         } else {
             if (scoreP1 > scoreP2) {
                 message = "Selamat " + player1Name + "! Kamu memenangkan permainan!";
+                // Bisa juga ditambahkan penyimpanan skor untuk pemenang mode 2P jika mau
+                // LeaderboardManager.addScore(player1Name, scoreP1);
+
             } else if (scoreP2 > scoreP1) {
                 message = "Selamat " + player2Name + "! Kamu memenangkan permainan!";
+                // LeaderboardManager.addScore(player2Name, scoreP2);
+
             } else {
                 message = "Permainan berakhir seri!";
             }
