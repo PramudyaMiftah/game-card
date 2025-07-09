@@ -8,6 +8,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import assetsmanager.SoundManager;
 
+// Leaderboard import not needed since same package
+
 public class GameWindow extends JFrame {
 
     private final ImageIcon backgroundGif;
@@ -29,6 +31,7 @@ public class GameWindow extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
+<<<<<<< HEAD
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setUndecorated(true);
 
@@ -52,6 +55,13 @@ public class GameWindow extends JFrame {
 
         // Set panel utama sebagai content pane dari JFrame
         setContentPane(mainPanel);
+=======
+        // --- Borderless "fullscreen-windowed" mode so dialogs can appear above ---
+        GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        setUndecorated(true); // remove window borders/title
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // occupy entire screen without exclusive FS
+        // ----------------------------------------------------------------------
+>>>>>>> 1deecc7 (Save current progress before updating)
 
         addKeyListener(new KeyAdapter() {
             @Override
@@ -118,6 +128,10 @@ public class GameWindow extends JFrame {
         PlayerNamePanel playerNamePanel = new PlayerNamePanel(mode, difficulty);
         mainPanel.add(playerNamePanel, "player_name");
         showCard("player_name");
+    }
+
+    public void showLeaderboard() {
+        setPanel(new LeaderboardPanel());
     }
 
     public void showMenu() {

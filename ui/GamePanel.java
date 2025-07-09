@@ -1,5 +1,7 @@
 package ui;
 
+import leaderboard.LeaderboardManager;
+
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
@@ -36,6 +38,12 @@ public class GamePanel extends JPanel {
 
     private int scoreP1 = 0;
     private int scoreP2 = 0;
+
+    // --- Arcade Scoring helpers ---
+    private int streakP1 = 0;
+    private int streakP2 = 0;
+    private int missesP1 = 0;
+    private int missesP2 = 0;
     private final Queue<Integer> playerTurnQueue = new LinkedList<>();
     private JLabel turnLabel, scoreLabel;
     private boolean isChecking = false;
@@ -129,7 +137,7 @@ public class GamePanel extends JPanel {
         for (String name : cardNames) {
             ImageIcon frontIcon = loadCardImage("/assets/cards/" + name, false);
             CardUI card = new CardUI(name, frontIcon, backIcon);
-            card.getButton().addActionListener(_ -> handleCardClick(card));
+            card.getButton().addActionListener(e -> handleCardClick(card));
             gridPanel.add(card.getButton());
         }
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -147,7 +155,7 @@ public class GamePanel extends JPanel {
         JButton backBtn = new JButton("Kembali ke Menu");
         backBtn.setBackground(Color.decode("#4682B4"));
         backBtn.setForeground(Color.WHITE);
-        backBtn.addActionListener(_ -> {
+        backBtn.addActionListener(e -> {
             stopTimer();
             GameWindow.getInstance().showMenu();
         });
@@ -173,13 +181,36 @@ public class GamePanel extends JPanel {
             CardUI second = openedCards.pop();
 
             if (first.getName().equals(second.getName())) { // Kartu cocok
+            // Hitung skor berbasis arcade (base * multiplier)
+            int base = switch (difficulty) {
+                case 1 -> 200; // Medium
+                case 2 -> 300; // Hard
+                default -> 100; // Easy
+            };
+            int currentPlayer = (mode == 2) ? playerTurnQueue.peek() : 1;
+
+            // Update streak dan multiplier
+            double multiplier;
+            if (currentPlayer == 1) {
+                streakP1++;
+                multiplier = Math.min(1.0 + 0.2 * (streakP1 - 1), 2.0);
+            } else {
+                streakP2++;
+                multiplier = Math.min(1.0 + 0.2 * (streakP2 - 1), 2.0);
+            }
+            int pairScore = (int) Math.round(base * multiplier);
+            if (currentPlayer == 1) {
+                scoreP1 += pairScore;
+            } else {
+                scoreP2 += pairScore;
+            }
+            updateScoreAndTurn();
                 first.setMatched(true);
                 second.setMatched(true);
                 matchedPairs.put(first.getName(), true);
 
                 if (mode == 2 && !playerTurnQueue.isEmpty()) {
-                    if (playerTurnQueue.peek() == 1) scoreP1++;
-                    else scoreP2++;
+                    
                     updateScoreAndTurn();
                 }
 
@@ -192,9 +223,22 @@ public class GamePanel extends JPanel {
                 }
                 isChecking = false;
             } else { // Kartu tidak cocok
-                javax.swing.Timer flipBackTimer = new javax.swing.Timer(1000, _ -> {
+                javax.swing.Timer flipBackTimer = new javax.swing.Timer(1000, ev -> {
                     first.flipDown();
                     second.flipDown();
+
+                    // Akurasi: penalti salah tebak
+                    int currentPlayer = (mode == 2) ? playerTurnQueue.peek() : 1;
+                    if (currentPlayer == 1) {
+                        scoreP1 = Math.max(0, scoreP1 - 50);
+                        streakP1 = 0;
+                        missesP1++;
+                    } else {
+                        scoreP2 = Math.max(0, scoreP2 - 50);
+                        streakP2 = 0;
+                        missesP2++;
+                    }
+                    updateScoreAndTurn();
                     if (mode == 2 && !playerTurnQueue.isEmpty()) {
                         playerTurnQueue.add(playerTurnQueue.poll()); // Ganti giliran pemain
                         updateScoreAndTurn();
@@ -286,6 +330,14 @@ public class GamePanel extends JPanel {
         }
     }
 
+    private String getDifficultyLabel() {
+        return switch (difficulty) {
+            case 1 -> "Medium";
+            case 2 -> "Hard";
+            default -> "Easy";
+        };
+    }
+
     private List<String> generateCardPairs(int totalCards) {
         String[] possible = {
                 "anjing", "avocado", "carrot", "coffe", "cupcake", "pig",
@@ -307,6 +359,7 @@ public class GamePanel extends JPanel {
     }
 
     private void showWinDialog() {
+<<<<<<< HEAD
         SoundManager.playSound("win.wav");
         String message;
         if (mode == 1) {
@@ -346,17 +399,27 @@ public class GamePanel extends JPanel {
         } else { // Kembali ke Menu
             GameWindow.getInstance().showMenu();
         }
+=======
+    // ---- Final score bonuses -------------------------------------------------
+    if (mode == 1) {
+        int diffFactor = switch (difficulty) { case 1 -> 2; case 2 -> 3; default -> 1; };
+        scoreP1 += timeLeft * 10 * diffFactor;          // time bonus
+        if (missesP1 == 0) scoreP1 += 500;              // perfect-round bonus
+    } else {
+        if (missesP1 == 0) scoreP1 += 500;
+        if (missesP2 == 0) scoreP2 += 500;
+>>>>>>> 1deecc7 (Save current progress before updating)
     }
 
-    private String getDifficultyLabel() {
-        return switch (difficulty) {
-            case 0 -> "Easy";
-            case 1 -> "Medium";
-            case 2 -> "Hard";
-            default -> "-";
-        };
+    // ---- Save scores to leaderboard -----------------------------------------
+    if (mode == 1) {
+        LeaderboardManager.addScore(player1Name, scoreP1);
+    } else {
+        LeaderboardManager.addScore(player1Name, scoreP1);
+        LeaderboardManager.addScore(player2Name, scoreP2);
     }
 
+<<<<<<< HEAD
     class RoundedPanel extends JPanel {
         private final int cornerRadius;
 
@@ -384,4 +447,46 @@ public class GamePanel extends JPanel {
             g.drawImage(backgroundGif.getImage(), 0, 0, getWidth(), getHeight(), this);
         }
     }
+=======
+    // ---- Build win message ---------------------------------------------------
+    String message;
+    if (mode == 1) {
+        message = String.format(
+            "Selamat %s! Kamu berhasil mencocokkan semua kartu!\nSkor kamu: %d",
+            player1Name, scoreP1);
+    } else if (scoreP1 > scoreP2) {
+        message = String.format("Selamat %s! Kamu memenangkan permainan!\n%d : %d",
+                                player1Name, scoreP1, scoreP2);
+    } else if (scoreP2 > scoreP1) {
+        message = String.format("Selamat %s! Kamu memenangkan permainan!\n%d : %d",
+                                player2Name, scoreP2, scoreP1);
+    } else {
+        message = String.format("Permainan berakhir seri!\n%d : %d", scoreP1, scoreP2);
+    }
+
+    // ---- Simple JOptionPane wrapped in JDialog ------------------------------
+    JOptionPane pane = new JOptionPane(
+        message,
+        JOptionPane.INFORMATION_MESSAGE,
+        JOptionPane.DEFAULT_OPTION,
+        null,
+        new Object[] { "Main Lagi", "Kembali ke Menu" },
+        "Main Lagi"
+    );
+
+    JDialog dialog = pane.createDialog(GameWindow.getInstance(), "Permainan Selesai!");
+    dialog.setModal(true);
+    dialog.setAlwaysOnTop(true);
+    dialog.setLocationRelativeTo(GameWindow.getInstance());
+    dialog.toFront();
+    dialog.setVisible(true);
+
+    // ---- Next action ---------------------------------------------------------
+    if ("Main Lagi".equals(pane.getValue())) {
+        GameWindow.getInstance().showDifficultySelection(mode);
+    } else {
+        GameWindow.getInstance().showMenu();
+    }
+}
+>>>>>>> 1deecc7 (Save current progress before updating)
 }

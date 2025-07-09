@@ -8,8 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LeaderboardManager {
+<<<<<<< HEAD
     private static final String SAVE_FILE = "/data-game/leaderboard.dat";
     private static final int MAX_ENTRIES = 10;
+=======
+    private static final String SAVE_FILE = "leaderboard.dat";
+    private static final int MAX_ENTRIES = 10;
+
+>>>>>>> 1deecc7 (Save current progress before updating)
     private static NavigableSet<ScoreEntry> cache;
 
     public static synchronized List<ScoreEntry> getScores() {
