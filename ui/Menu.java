@@ -24,7 +24,7 @@ public class Menu {
     // Static initializer block: Kode ini akan dijalankan satu kali saat kelas dimuat
     static {
         try {
-            PIXEL_FONT_BASE = Font.createFont(Font.TRUETYPE_FONT, Menu.class.getResourceAsStream("/assets/fonts/pixel-gamer.otf"));
+            PIXEL_FONT_BASE = Font.createFont(Font.TRUETYPE_FONT, Menu.class.getResourceAsStream("/assets/fonts/press-start.ttf"));
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(PIXEL_FONT_BASE);
 

@@ -1,6 +1,6 @@
 package ui;
 
-import javax.swing.*;
+//import javax.swing.*;
 
 public class DifficultySelectionPanel extends AbstractMenuPanel {
 
@@ -8,7 +8,9 @@ public class DifficultySelectionPanel extends AbstractMenuPanel {
 
     public DifficultySelectionPanel(int mode) {
         // 1. Panggil konstruktor parent
-        super("menu-utama-sakura.gif"); // Ganti nama GIF jika perlu
+        super("menu-utama-sakura.gif");
+        this.title = "MEMORIZE CARD";
+        this.subtitle = "PILIH TINGKAT KESULITAN";
         this.mode = mode;
 
         // 2. Tentukan pilihan menu untuk panel ini

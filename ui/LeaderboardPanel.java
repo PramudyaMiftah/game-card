@@ -20,35 +20,45 @@ public class LeaderboardPanel extends JPanel {
         JLabel title = new JLabel("HIGH SCORES", SwingConstants.CENTER);
         title.setFont(Menu.DISPLAY_FONT_LARGE);
         title.setForeground(Color.WHITE);
+        title.setBorder(BorderFactory.createEmptyBorder(200, 0, 20, 0)); // top: 60
         add(title, BorderLayout.NORTH);
 
         // ----- Center list -------------------------------------------------
-        JPanel center = new JPanel();
-        center.setOpaque(false);
-        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+        JPanel centerContent = new JPanel();
+        centerContent.setLayout(new BoxLayout(centerContent, BoxLayout.Y_AXIS));
+        centerContent.setOpaque(false);
+
 
         Font headerFont = Menu.DISPLAY_FONT_MEDIUM;
         Font rowFont    = Menu.DISPLAY_FONT_BUTTON;
 
         // Header row
         JPanel header = buildRow("RANK", "NAME", "SCORE", headerFont, Color.WHITE);
-        header.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        center.add(header);
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE)); // garis bawah putih
+        centerContent.add(header);
 
         // Limit width
         int fixedWidth = 400;
-        center.setMaximumSize(new Dimension(fixedWidth, Integer.MAX_VALUE));
+        centerContent.setMaximumSize(new Dimension(fixedWidth, Integer.MAX_VALUE));
         List<ScoreEntry> scores = LeaderboardManager.getScores();
         int rank = 1;
         for (ScoreEntry entry : scores) {
             Color color = (rank == 1) ? Color.YELLOW : Color.WHITE;
             JPanel row = buildRow(ordinal(rank), entry.getName(), String.valueOf(entry.getScore()), rowFont, color);
             row.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-            center.add(row);
+            centerContent.add(row);
             rank++;
         }
 
-        JScrollPane scroll = new JScrollPane(center, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JPanel tablePanel = new JPanel();
+        tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.Y_AXIS));
+        tablePanel.setOpaque(true);
+        tablePanel.setBackground(new Color(0, 0, 0, 100)); // hitam transparan
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 80));
+        tablePanel.add(centerContent);
+
+
+        JScrollPane scroll = new JScrollPane(tablePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);

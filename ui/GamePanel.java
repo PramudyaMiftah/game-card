@@ -12,6 +12,9 @@ import java.util.Queue;
 import java.util.Stack;
 import java.util.Map;
 import java.util.HashMap;
+
+import assetsmanager.ImageManager;
+//import assetsmanager.VideoManager;
 import leaderboard.LeaderboardManager;
 import assetsmanager.SoundManager;
 
@@ -37,6 +40,8 @@ public class GamePanel extends JPanel {
     private JLabel turnLabel, scoreLabel;
     private boolean isChecking = false;
 
+    private final ImageIcon backgroundGif;
+
     public GamePanel(int mode, int difficulty, String player1Name, String player2Name) {
         this.mode = mode;
         this.difficulty = difficulty;
@@ -45,16 +50,27 @@ public class GamePanel extends JPanel {
 
         setLayout(new BorderLayout());
         setBackground(Color.decode("#ADD8E6"));
+        backgroundGif = ImageManager.loadImageIcon("game-panel.jpeg.jpg");
 
         switch (difficulty) {
-            case 1 -> { rows = 4; cols = 5; } // Medium
-            case 2 -> { rows = 4; cols = 6; } // Hard
-            default -> { rows = 4; cols = 4; } // Easy
+            case 1 -> {
+                rows = 4;
+                cols = 5;
+            } // Medium
+            case 2 -> {
+                rows = 4;
+                cols = 6;
+            } // Hard
+            default -> {
+                rows = 4;
+                cols = 4;
+            } // Easy
         }
 
         // --- Panel Atas (Info Pemain, Skor, Waktu) ---
-        JPanel topPanel = new JPanel(new BorderLayout(10, 0));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        RoundedPanel topPanel = new RoundedPanel(30); // 30px radius sudut
+        topPanel.setLayout(new BorderLayout(10, 0));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
         topPanel.setBackground(Color.decode("#4682B4"));
         Font statusFont = Menu.DISPLAY_FONT_BUTTON;
         Color fontColor = Color.WHITE;
@@ -95,11 +111,18 @@ public class GamePanel extends JPanel {
             topPanel.add(turnLabel, BorderLayout.WEST);
             topPanel.add(scoreLabel, BorderLayout.EAST);
         }
-        add(topPanel, BorderLayout.NORTH);
+        JPanel topWrapper = new JPanel(new BorderLayout());
+        topWrapper.setOpaque(false); // Biar transparan
+        topWrapper.setBorder(BorderFactory.createEmptyBorder(20, 50, 0, 50)); // Atas, kiri, bawah, kanan (margin luar)
+        topWrapper.add(topPanel, BorderLayout.CENTER);
+
+        add(topWrapper, BorderLayout.NORTH);
+
 
         // --- Panel Kartu (Grid Permainan) ---
-        JPanel gridPanel = new JPanel(new GridLayout(rows, cols, 5, 5));
-        gridPanel.setBackground(Color.decode("#ADD8E6"));
+        RoundedPanel gridPanel = new RoundedPanel(40); // 40 = radius
+        gridPanel.setLayout(new GridLayout(rows, cols, 5, 5));
+        gridPanel.setBackground(Color.decode("#EFEFEF"));
         List<String> cardNames = generateCardPairs(rows * cols);
         ImageIcon backIcon = loadCardImage("/assets/cards/card_back.png", true);
 
@@ -110,7 +133,7 @@ public class GamePanel extends JPanel {
             gridPanel.add(card.getButton());
         }
         JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setBorder(BorderFactory.createEmptyBorder(100, 300, 20, 300));
+        wrapper.setBorder(BorderFactory.createEmptyBorder(20, 300, 20, 300));
         wrapper.setOpaque(false); // Biar transparan kalau ada background
 
         wrapper.add(gridPanel, BorderLayout.CENTER); // Masukkan grid ke tengah wrapper
@@ -119,7 +142,8 @@ public class GamePanel extends JPanel {
 
         // --- Panel Bawah (Tombol Kembali) ---
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBackground(Color.decode("#ADD8E6"));
+        bottomPanel.setOpaque(false);
+//        bottomPanel.setBackground(Color.decode("#ADD8E6"));
         JButton backBtn = new JButton("Kembali ke Menu");
         backBtn.setBackground(Color.decode("#4682B4"));
         backBtn.setForeground(Color.WHITE);
@@ -331,5 +355,33 @@ public class GamePanel extends JPanel {
             case 2 -> "Hard";
             default -> "-";
         };
+    }
+
+    class RoundedPanel extends JPanel {
+        private final int cornerRadius;
+
+        public RoundedPanel(int radius) {
+            super();
+            this.cornerRadius = radius;
+            setOpaque(false); // Supaya latar belakang transparan dulu
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+            g2.dispose();
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g); // penting untuk gambar component anak
+        if (backgroundGif != null) {
+            g.drawImage(backgroundGif.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }
