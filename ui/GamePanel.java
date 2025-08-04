@@ -174,7 +174,7 @@ public class GamePanel extends JPanel {
         for (String name : cardNames) {
             ImageIcon frontIcon = loadCardImage("/assets/cards/" + name, false);
             CardUI card = new CardUI(name, frontIcon, backIcon);
-            card.getButton().addActionListener(_ -> handleCardClick(card));
+            card.getButton().addActionListener(e -> handleCardClick(card));
             gridPanel.add(card.getButton());
             cardList.add(card);
             if (firstCardByName.containsKey(name)) {
@@ -201,7 +201,7 @@ public class GamePanel extends JPanel {
         JButton backBtn = new JButton("Kembali ke Menu");
         backBtn.setBackground(Color.decode("#4682B4"));
         backBtn.setForeground(Color.WHITE);
-        backBtn.addActionListener(_ -> {
+        backBtn.addActionListener(e -> {
             stopTimer();
             GameWindow.getInstance().showMenu();
         });
@@ -210,7 +210,7 @@ public class GamePanel extends JPanel {
         hintBtn = new JButton("Hint -5 detik");
         hintBtn.setBackground(Color.decode("#32CD32"));
         hintBtn.setForeground(Color.WHITE);
-        hintBtn.addActionListener(_ -> giveHint());
+        hintBtn.addActionListener(e -> giveHint());
         bottomPanel.add(Box.createHorizontalStrut(20));
         bottomPanel.add(hintBtn);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -278,7 +278,7 @@ public class GamePanel extends JPanel {
                 }
                 isChecking = false;
             } else {
-                Timer flipBackTimer = new Timer(1000, _ -> {
+                Timer flipBackTimer = new Timer(1000, e -> {
                     first.flipDown();
                     second.flipDown();
                     if (mode == 2 && !playerTurnQueue.isEmpty()) {
@@ -294,7 +294,7 @@ public class GamePanel extends JPanel {
     }
 
     private void startCountdownTimer() {
-        countdownTimer = new Timer(1000, _ -> {
+        countdownTimer = new Timer(1000, e -> {
             if (timeLeft > 0) {
                 timeLeft--;
                 updateTampilanWaktu();
@@ -507,7 +507,7 @@ public class GamePanel extends JPanel {
         }
 
         // 2. Tunggu 1 detik, lalu tutup semua kartu
-        Timer previewTimer = new Timer(1000, _ -> {
+        Timer previewTimer = new Timer(1000, e -> {
             for (CardUI card : cardList) {
                 card.flipDown();
             }
@@ -545,7 +545,7 @@ public class GamePanel extends JPanel {
                 first.setHinted(true);
                 second.setHinted(true);
 
-                javax.swing.Timer t = new javax.swing.Timer(1500, _ -> {
+                javax.swing.Timer t = new javax.swing.Timer(1500, e -> {
                     first.setHinted(false);
                     second.setHinted(false);
                 });
@@ -554,7 +554,7 @@ public class GamePanel extends JPanel {
 
                 hintBtn.setEnabled(false);
                 hintOnCooldown = true;
-                javax.swing.Timer cooldown = new javax.swing.Timer(3000, _ -> {
+                javax.swing.Timer cooldown = new javax.swing.Timer(3000, e -> {
                     hintOnCooldown = false;
                     hintBtn.setEnabled(true);
                 });

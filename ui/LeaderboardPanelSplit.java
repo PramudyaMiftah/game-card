@@ -18,11 +18,27 @@ public class LeaderboardPanelSplit extends JPanel {
         setLayout(new BorderLayout());
         backgroundGif = VideoManager.loadImageIcon("menu-utama-sakura.gif");
 
-        JLabel title = new JLabel("HIGH SCORES", SwingConstants.CENTER);
-        title.setFont(Menu.DISPLAY_FONT_LARGE);
-        title.setForeground(Color.WHITE);
-        title.setBorder(BorderFactory.createEmptyBorder(200, 0, 20, 0));
-        add(title, BorderLayout.NORTH);
+        // ---------- Title (Custom drawn with outline) ----------
+        JPanel titlePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                
+                String titleText = "HIGH SCORES";
+                g2d.setFont(Menu.DISPLAY_FONT_LARGE);
+                FontMetrics fm = g2d.getFontMetrics();
+                int titleWidth = fm.stringWidth(titleText);
+                int x = (getWidth() - titleWidth) / 2;
+                int y = getHeight() - 30;
+                
+                drawTextWithOutline(g2d, titleText, x, y, Menu.WARNA_JUDUL, 2);
+            }
+        };
+        titlePanel.setOpaque(false);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(200, 0, 20, 0));
+        add(titlePanel, BorderLayout.NORTH);
 
         JPanel centerWrapper = new JPanel();
         centerWrapper.setOpaque(false);
@@ -35,14 +51,17 @@ public class LeaderboardPanelSplit extends JPanel {
         JPanel tableBg = new JPanel();
         tableBg.setOpaque(true);
         tableBg.setBackground(new Color(0, 0, 0, 100));
-        tableBg.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 60));
+        tableBg.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         tableBg.add(centerWrapper);
 
         add(tableBg, BorderLayout.CENTER);
 
         JButton back = new JButton("Kembali");
-        back.setFont(Menu.DISPLAY_FONT_BUTTON);
-        back.addActionListener(e -> GameWindow.getInstance().showMenu());
+        styleMainMenuButton(back);
+        back.addActionListener(e -> {
+            // Keep music playing when returning to menu
+            GameWindow.getInstance().showMenu();
+        });
         JPanel south = new JPanel();
         south.setOpaque(false);
         south.add(back);
@@ -89,8 +108,8 @@ public class LeaderboardPanelSplit extends JPanel {
 
         JLabel rank = createLabel(r, Menu.FONT_ANGKA, c, 80);
         rank.setHorizontalAlignment(SwingConstants.CENTER);
-        JLabel name = createLabel(n, f, c, 230);
-        JLabel score = createLabel(s, Menu.FONT_ANGKA, c, 100);
+        JLabel name = createLabel(n, f, c, 250);
+        JLabel score = createLabel(s, Menu.FONT_ANGKA, c, 120);
         score.setHorizontalAlignment(SwingConstants.RIGHT);
 
         row.add(rank);
@@ -125,6 +144,33 @@ public class LeaderboardPanelSplit extends JPanel {
             case 3 -> n + "RD";
             default -> n + "TH";
         };
+    }
+
+    private void styleMainMenuButton(JButton button) {
+        button.setFont(Menu.DISPLAY_FONT_BUTTON); // This font works fine for "Kembali" (no numbers)
+        button.setBackground(Menu.WARNA_TOMBOL_BIRU);
+        button.setForeground(Color.WHITE);
+        button.setBorderPainted(true);
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
+        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        button.setMargin(new Insets(8, 16, 8, 16));
+    }
+
+    private void drawTextWithOutline(Graphics2D g2d, String text, int x, int y, Color textColor, int outlineThickness) {
+        // Draw black outline
+        g2d.setColor(Color.BLACK);
+        for (int dx = -outlineThickness; dx <= outlineThickness; dx++) {
+            for (int dy = -outlineThickness; dy <= outlineThickness; dy++) {
+                if (dx != 0 || dy != 0) {
+                    g2d.drawString(text, x + dx, y + dy);
+                }
+            }
+        }
+        // Draw main text
+        g2d.setColor(textColor);
+        g2d.drawString(text, x, y);
     }
 
     @Override

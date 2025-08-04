@@ -124,8 +124,11 @@ public class GameWindow extends JFrame {
     }
 
     public void showMenu() {
-        SoundManager.stopMusic();
-        SoundManager.loopMusic("watflo.wav");
+        // Only restart music if it's not already playing the correct track
+        if (!"watflo.wav".equals(SoundManager.getCurrentMusicName())) {
+            SoundManager.stopMusic();
+            SoundManager.loopMusic("watflo.wav");
+        }
         // Kembali ke menu utama (PlayPanel)
         showCard("play");
     }

@@ -93,7 +93,7 @@ public class PlayerNamePanel extends JPanel {
         startButton.setForeground(Color.WHITE);
         actionPanel.add(startButton);
 
-        startButton.addActionListener(_ -> {
+        startButton.addActionListener(e -> {
             SoundManager.playSound("button-click.wav");
             List<String> playerNames = new ArrayList<>();
             boolean allNamesValid = true;
@@ -114,7 +114,7 @@ public class PlayerNamePanel extends JPanel {
             }
         });
 
-        backButton.addActionListener(_ -> {
+        backButton.addActionListener(e -> {
             SoundManager.playSound("button-click.wav");
             GameWindow.getInstance().showDifficultySelection(mode);
         });
